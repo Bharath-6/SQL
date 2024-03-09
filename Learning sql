@@ -1,0 +1,217 @@
+-->Alter command
+Add column
+Alter table student Add address
+Remove cokumn
+Modify data type
+Modify data ype length
+add constraints
+Remove constraints
+Remove column/table
+
+
+In sql where the keywords should be either small letters and captial letter should be ok
+
+-->creating database
+CREATE DATABASE record_company;
+
+-->Delteting the database
+Drop Database record_company;
+
+-->the database which we are going to work can be done with below command
+
+USE record_company; #where test is our database
+
+-->creating a table
+CREATE TABLE test(
+    test_column INT
+);
+
+-->after creating the table if we want to change anything in the table
+
+ALTER TABLE test
+
+ADD another_column VARCHAR(255);
+
+-->if you want to drop the table 
+
+Drop table test;
+
+-->lets create a band table and insert some values in it
+
+CREATE TABLE band(
+    id Int NOT NULL AUTO_INCREMENT, #it automatically increases the value of id when the row is increasing
+
+    name VARCHAR(255) NOT NULL #it should not contain any null values
+
+    PRIMARY KEY(id) # allocating id as primary key
+
+);
+
+-->we wil create another database albums
+CREATE TABLE albums(
+    id INT NOT NULL AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    release_year INT, # we will keep it like this because we will insert again
+    band_id INT NOT NULL,
+    PRIMARY KEY (id)
+    # where we are connecting to primary key as id and foreign as band id
+    FOREIGN KEY (band_id) REFERENCES bands(id)
+)
+
+-->Inserting into bands
+INSERT INTO bands (name)
+VALUES ('Iron Maider');
+
+INSERT INTO bands (name)
+VALUES ('Deuce'), ('Avenged Sevenfold'), ('Ankor');
+
+--> to get the bands table and where * indicates all the columns
+SELECT * FROM bands;
+
+# The below gives only first two values of the bands table
+SELECT * FROM bands LIMIT 2;
+
+# we need to get only name column from the bands table
+SELECT name FROM bands;
+
+# changing the columns name
+SELECT id AS 'ID', name AS 'Band Name'
+FROM bands;
+
+# ORder by name is used to get in alphabetical order
+SELECT * FROM bands ORDER BY name;
+# to reverse the order MEANS IN DESCENDING ORDER EITHER NAME OR NUMBERS
+SELECT * FROM bands ORDER BY name DESC;
+# ASC IS USED FOR ALPHABETICAL ORDER AND IN THE CASE OF NUMBER FROM START WITH 1
+
+# Now insert the values in albums table
+
+INSERT INTO albums(name,release_year, band_id)
+VALUES ('The number of the beasts',1985,1),
+('power slave', 1984,1),
+('nightmare',2018,2),
+('nightmare',2010,3),
+('Test Album',NULL,3);
+
+SELECT * FROM albums;
+
+SELECT name FROM albums;
+
+--> we don't need same names in the table with need unique names in databases(wont allow duplicate names)
+SELECT DISTINCT name FROM albums;
+
+-->update partiuclar year or anything in the table by using update
+-->below example previosly it was 1985 now it changed to 1982
+--> and applicable for id no.1 where the release will be changed to 1982
+UPDATE albums
+SET release_year = 1982
+WHERE id = 1;
+
+-->selecting the values which released before the 2000
+
+SELECT * FROM albums
+WHERE release_year < 2000;
+
+-->Selecting the name where like means exactly with particular letters name
+-->which ever the words contains er provide me all those
+-->we will get er names and band id whith 2
+SELECT * FROM albums
+WHERE name LIKE '%er%'OR band_id = 2;
+
+-->particular year and particular band id
+
+SELECT * FROM albums
+WHERE release_year = 1984 AND band_id = 1;
+
+-->between some point of year values we can get
+SELECT * FROM albums
+WHERE release_year BETWEEN 2000 AND 2018;
+
+-->The below command is  for find the values which is null
+WHERE release_year IS NULL;
+
+-->Delete e row in albums table
+DELETE FROM albums WHERE id = 5;
+
+-->lets know about joins
+-->join bands table with album table
+-->where we are going to return bands table id is equal albums table band_id
+SELECT * FROM bands
+JOIN albums ON bands.id = albums.band_id;
+
+-->INner joins combines the values on left and where it lists first table which is left(bands)
+SELECT * FROM bands
+INNER JOIN albums ON bands.id = albums.band_id;
+
+-->left join first it will give  matched values and leftover all are the left table means first table left over values,  give values over left hand side
+SELECT * FROM bands
+LEFT JOIN albums ON bands.id = albums.band_id;
+
+-->Right join first it will give  matched values and leftover all are the right table means first table left over values, give values over right hand side
+SELECT * FROM albums
+LEFT JOIN bands ON bands.id = albums.band_id;
+
+-->Defination look over some where
+-->just practical
+
+-->Aggreate Functions
+
+-->we will get the average of the all release year
+SELECT AVG(release_year) FROM albums;
+
+-->to get sum
+SELECT SUM(release_year) FROM albums;
+
+-->Group BY
+-->we gonna get the for particular column how many records are their The GROUP BY statement is often used with aggregate functions (COUNT(), MAX(), MIN(), SUM(), AVG()) to group the result-set by one or more columns.
+
+SELECT band_id, COUNT(band_id) FROM albums
+GROUP BY band_id;
+
+"""The way we get
+
+band_id   COUNT(band_id)
+1           2
+2           1
+3           1"""
+
+-->return the number of albums does each band_name is having 
+SELECT b.name AS band_name, COUNT(a.id) AS num_albums
+FROM bands AS b 
+LEFT JOIN albums AS a On b.id = a.band_id
+GROUP BY b.id;
+
+""" 
+band_name     num_albums
+Irom Maider       2
+Deuce             1
+Avenged seve      1
+Ankor             0
+where the id 1 is having band_id as 2 times 1 and id 2 is having band_id 2 as 1 time as for 3
+"""
+
+-->where  statements happen before group by so we use for after group by is having
+-->we will get only num of albums are 1
+SELECT b.name AS band_name, COUNT(a.id) AS num_albums
+FROM bands AS b 
+LEFT JOIN albums AS a On b.id = a.band_id
+GROUP BY b.id
+HAVING num_albums=1;
+
+"""
+band_name    num_albums
+Deuce         1
+Avenged sev.. 1
+"""
+
+-->where can used as 
+SELECT b.name AS band_name, COUNT(a.id) AS num_albums
+FROM bands AS b 
+LEFT JOIN albums AS a On b.id = a.band_id
+WHERE b.name = "Deuce"
+GROUP BY b.id
+HAVING num_albums=1;
+"""
+band_name    num_albums
+Deuce         1
+"""
