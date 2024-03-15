@@ -215,3 +215,13 @@ HAVING num_albums=1;
 band_name    num_albums
 Deuce         1
 """
+
+
+
+"""window fucntion"""
+"""adding to existing table with a agereate function is know as window function"""
+select * avg(salary) over (partition by dept_id) as avg_sal from employees;
+
+"""rank function"""
+select *, rank() over(partition by dept_id order by salary by desc) as rank from employee
+"""dense_rank() is similar to rank function where the difference is rank sometimes skip the rank but dense_rank() won't skip"""
