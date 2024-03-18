@@ -896,3 +896,241 @@ SUM(if(month="Nov",revenue,null)) as Nov_Revenue,
 SUM(if(month="Dec",revenue,null)) as Dec_Revenue
 from Department
 group by id
+
+Table: Activity
+
++---------------+---------+
+| Column Name   | Type    |
++---------------+---------+
+| user_id       | int     |
+| session_id    | int     |
+| activity_date | date    |
+| activity_type | enum    |
++---------------+---------+
+This table may have duplicate rows.
+The activity_type column is an ENUM (category) of type ('open_session', 'end_session', 'scroll_down', 'send_message').
+The table shows the user activities for a social media website. 
+Note that each session belongs to exactly one user.
+ 
+
+Write a solution to find the daily active user count for a period of 30 days ending 2019-07-27 inclusively. A user was active on someday if they made at least one activity on that day.
+
+Return the result table in any order.
+
+The result format is in the following example.
+
+ 
+
+Example 1:
+
+Input: 
+Activity table:
++---------+------------+---------------+---------------+
+| user_id | session_id | activity_date | activity_type |
++---------+------------+---------------+---------------+
+| 1       | 1          | 2019-07-20    | open_session  |
+| 1       | 1          | 2019-07-20    | scroll_down   |
+| 1       | 1          | 2019-07-20    | end_session   |
+| 2       | 4          | 2019-07-20    | open_session  |
+| 2       | 4          | 2019-07-21    | send_message  |
+| 2       | 4          | 2019-07-21    | end_session   |
+| 3       | 2          | 2019-07-21    | open_session  |
+| 3       | 2          | 2019-07-21    | send_message  |
+| 3       | 2          | 2019-07-21    | end_session   |
+| 4       | 3          | 2019-06-25    | open_session  |
+| 4       | 3          | 2019-06-25    | end_session   |
++---------+------------+---------------+---------------+
+Output: 
++------------+--------------+ 
+| day        | active_users |
++------------+--------------+ 
+| 2019-07-20 | 2            |
+| 2019-07-21 | 2            |
++------------+--------------+ 
+Explanation: Note that we do not care about days with zero active users.
+
+SELECT 
+    activity_date AS day, 
+    COUNT(DISTINCT user_id) AS active_users
+FROM 
+    activity
+WHERE 
+    activity_date BETWEEN DATE_ADD('2019-07-27', INTERVAL -29 DAY) AND '2019-07-27'
+GROUP BY 
+    activity_date;
+
+Table: Customer
+
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| customer_id | int     |
+| product_key | int     |
++-------------+---------+
+This table may contain duplicates rows. 
+customer_id is not NULL.
+product_key is a foreign key (reference column) to Product table.
+ 
+
+Table: Product
+
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| product_key | int     |
++-------------+---------+
+product_key is the primary key (column with unique values) for this table.
+ 
+
+Write a solution to report the customer ids from the Customer table that bought all the products in the Product table.
+
+Return the result table in any order.
+
+The result format is in the following example.
+
+ 
+
+Example 1:
+
+Input: 
+Customer table:
++-------------+-------------+
+| customer_id | product_key |
++-------------+-------------+
+| 1           | 5           |
+| 2           | 6           |
+| 3           | 5           |
+| 3           | 6           |
+| 1           | 6           |
++-------------+-------------+
+Product table:
++-------------+
+| product_key |
++-------------+
+| 5           |
+| 6           |
++-------------+
+Output: 
++-------------+
+| customer_id |
++-------------+
+| 1           |
+| 3           |
++-------------+
+Explanation: 
+The customers who bought all the products (5 and 6) are customers with IDs 1 and 3.
+
+select distinct customer_id from customer
+group by customer_id
+having count(distinct product_key)= (select count(product_key) from product) 
+
+"""Table: Employees
+
++-------------+----------+
+| Column Name | Type     |
++-------------+----------+
+| employee_id | int      |
+| name        | varchar  |
+| manager_id  | int      |
+| salary      | int      |
++-------------+----------+
+In SQL, employee_id is the primary key for this table.
+This table contains information about the employees, their salary, and the ID of their manager. Some employees do not have a manager (manager_id is null). 
+ 
+
+Find the IDs of the employees whose salary is strictly less than $30000 and whose manager left the company. When a manager leaves the company, their information is deleted from the Employees table, but the reports still have their manager_id set to the manager that left.
+
+Return the result table ordered by employee_id.
+
+The result format is in the following example.
+
+ 
+
+Example 1:
+
+Input:  
+Employees table:
++-------------+-----------+------------+--------+
+| employee_id | name      | manager_id | salary |
++-------------+-----------+------------+--------+
+| 3           | Mila      | 9          | 60301  |
+| 12          | Antonella | null       | 31000  |
+| 13          | Emery     | null       | 67084  |
+| 1           | Kalel     | 11         | 21241  |
+| 9           | Mikaela   | null       | 50937  |
+| 11          | Joziah    | 6          | 28485  |
++-------------+-----------+------------+--------+
+Output: 
++-------------+
+| employee_id |
++-------------+
+| 11          |
++-------------+
+
+Explanation: 
+The employees with a salary less than $30000 are 1 (Kalel) and 11 (Joziah).
+Kalel's manager is employee 11, who is still in the company (Joziah).
+Joziah's manager is employee 6, who left the company because there is no row for employee 6 as it was deleted."""
+SELECT employee_id 
+FROM Employees 
+WHERE manager_id NOT IN (SELECT employee_id FROM Employees) 
+and salary < 30000
+ORDER BY employee_id;
+
+
+"""Table: Seat
+
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| id          | int     |
+| student     | varchar |
++-------------+---------+
+id is the primary key (unique value) column for this table.
+Each row of this table indicates the name and the ID of a student.
+id is a continuous increment.
+ 
+
+Write a solution to swap the seat id of every two consecutive students. If the number of students is odd, the id of the last student is not swapped.
+
+Return the result table ordered by id in ascending order.
+
+The result format is in the following example.
+
+ 
+
+Example 1:
+
+Input: 
+Seat table:
++----+---------+
+| id | student |
++----+---------+
+| 1  | Abbot   |
+| 2  | Doris   |
+| 3  | Emerson |
+| 4  | Green   |
+| 5  | Jeames  |
++----+---------+
+Output: 
++----+---------+
+| id | student |
++----+---------+
+| 1  | Doris   |
+| 2  | Abbot   |
+| 3  | Green   |
+| 4  | Emerson |
+| 5  | Jeames  |
++----+---------+
+Explanation: 
+Note that if the number of students is odd, there is no need to change the last one's seat."""
+
+select
+case 
+when id%2=0 then id-1
+when (id%2!=0 and id = (select max(id) from Seat)) then id
+when id%2!=0 then id+1
+end as id,
+student
+from seat
+order by id
